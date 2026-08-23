@@ -8,6 +8,7 @@ python-dotenv>=1.0
 SQLAlchemy[asyncio]>=2.0.36,<3
 alembic>=1.14
 asyncpg>=0.30
+psycopg2-binary>=2.9
 aiosqlite>=0.20
 
 # --- Cache ---
