@@ -7,12 +7,40 @@ Usage:
 import argparse
 import asyncio
 import logging
+import os
 
 from app.bot.dispatcher import build_bot, build_dispatcher
 from app.config import get_settings
 from app.logging_setup import setup_logging
 
 logger = logging.getLogger("app")
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PROJECT = os.path.dirname(HERE)
+
+
+async def _init_database() -> None:
+    """Run alembic migrations and seed reference data on startup."""
+    logger.info("Running database migrations...")
+    try:
+        from alembic.config import Config as AlembicConfig
+        from alembic import command as alembic_cmd
+
+        cfg = AlembicConfig(os.path.join(PROJECT, "alembic.ini"))
+        cfg.set_main_option("script_location", os.path.join(PROJECT, "migrations"))
+        await asyncio.to_thread(alembic_cmd.upgrade, cfg, "head")
+        logger.info("Migrations complete.")
+    except Exception as exc:
+        logger.error("Migration failed: %s", exc)
+        raise
+
+    logger.info("Seeding reference data...")
+    try:
+        from app.database.seed import seed as seed_fn
+
+        await seed_fn()
+    except Exception as exc:
+        logger.warning("Seed skipped or failed (may already exist): %s", exc)
 
 
 async def run_polling() -> None:
@@ -40,6 +68,8 @@ async def run_webhook() -> None:
     webhook_url = settings.WEBHOOK_URL or settings.RENDER_EXTERNAL_URL
     if not webhook_url:
         raise RuntimeError("WEBHOOK_URL must be set when BOT_MODE=webhook")
+
+    await _init_database()
 
     bot = build_bot()
     dp = build_dispatcher()
