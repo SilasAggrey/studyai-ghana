@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="StudyAI Ghana API", version="0.1.0")
 
 
+@app.get("/")
+async def root():
+    return {"status": "ok", "service": "studyai-ghana"}
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "studyai-ghana"}
