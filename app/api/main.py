@@ -27,16 +27,16 @@ async def health():
 
 @app.post("/webhook/{secret}")
 async def webhook(secret: str, request: Request):
-    """Telegram webhook receiver. Bot polling is preferred in development."""
+    """Telegram webhook receiver."""
     settings = get_settings()
     if settings.WEBHOOK_SECRET and secret != settings.WEBHOOK_SECRET:
         from fastapi import HTTPException
 
         raise HTTPException(status_code=403, detail="Invalid secret")
-    if settings.BOT_MODE != "webhook":
+    if not getattr(request.app.state, "bot", None):
         from fastapi import HTTPException
 
-        raise HTTPException(status_code=400, detail="Webhook mode is not enabled")
+        raise HTTPException(status_code=503, detail="Bot not initialized")
 
     update = Update.model_validate(await request.json(), context={"bot": request.app.state.bot})
     from app.bot.dispatcher import build_dispatcher
