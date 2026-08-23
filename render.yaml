@@ -5,7 +5,6 @@ services:
     dockerfilePath: Dockerfile
     port: 8080
     healthCheckPath: /health
-    startCommand: bash start.sh
     envVars:
       - key: BOT_MODE
         value: webhook
