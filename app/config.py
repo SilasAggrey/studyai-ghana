@@ -42,13 +42,13 @@ class Settings(BaseSettings):
     FREE_QUIZ_DAILY_LIMIT: int = 3
     FREE_QUIZ_MAX_QUESTIONS: int = 10
     FREE_EXAMS_DAILY_LIMIT: int = 1
-    FREE_MAX_DOCUMENT_PAGES: int = 30
+    FREE_MAX_DOCUMENT_PAGES: int = 100
 
     # --- Premium plan limits ---
     PREMIUM_AI_DAILY_LIMIT: int = 200
     PREMIUM_QUIZ_DAILY_LIMIT: int = 100
     PREMIUM_EXAMS_DAILY_LIMIT: int = 20
-    PREMIUM_MAX_DOCUMENT_PAGES: int = 400
+    PREMIUM_MAX_DOCUMENT_PAGES: int = 1000
 
     # --- Abuse prevention ---
     RATE_LIMIT_PER_MINUTE: int = 30
