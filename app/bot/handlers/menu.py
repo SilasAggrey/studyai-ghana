@@ -8,6 +8,7 @@ from datetime import date, datetime
 from app.bot.common import cancel_row
 from app.bot.keyboards import (
     main_menu,
+    back_to_menu_keyboard,
     exam_keyboard,
     after_results_keyboard,
     flashcard_menu_keyboard,
@@ -49,7 +50,7 @@ async def back_to_menu(call: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "menu:notes")
 async def menu_notes(call: CallbackQuery):
-    await call.message.edit_text(NOTES_PROMPT)
+    await call.message.edit_text(NOTES_PROMPT, reply_markup=back_to_menu_keyboard())
     await call.answer()
 
 
@@ -57,7 +58,8 @@ async def menu_notes(call: CallbackQuery):
 async def menu_leaderboard(call: CallbackQuery):
     await call.message.edit_text(
         "🏆 <b>Leaderboard</b>\n\nThis feature is part of <b>Phase 3</b>. "
-        "Weekly and monthly rankings are on the way."
+        "Weekly and monthly rankings are on the way.",
+        reply_markup=back_to_menu_keyboard(),
     )
     await call.answer()
 
@@ -91,7 +93,7 @@ async def cmd_premium(message: Message, session, user):
 
 @router.message(Command("notes"))
 async def cmd_notes(message: Message):
-    await message.answer(NOTES_PROMPT)
+    await message.answer(NOTES_PROMPT, reply_markup=back_to_menu_keyboard())
 
 
 @router.callback_query(F.data == "cmd:cancel")

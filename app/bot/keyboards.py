@@ -325,6 +325,15 @@ def flashcard_done_keyboard() -> InlineKeyboardMarkup:
     )
 
 
+def back_to_menu_keyboard() -> InlineKeyboardMarkup:
+    """Single-row keyboard for informational screens (e.g. Study Notes)."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="🏠 Main Menu", callback_data="menu:main")]
+        ]
+    )
+
+
 def studyplan_menu_keyboard(has_plan: bool) -> InlineKeyboardMarkup:
     if has_plan:
         return InlineKeyboardMarkup(
