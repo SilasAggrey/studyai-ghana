@@ -22,7 +22,7 @@ from app.bot.keyboards import (
 )
 from app.bot.states import QuizSetup
 from app.bot.texts import AI_FAILED, AI_NOT_CONFIGURED, build_daily_limit_text
-from app.database.models import QuizQuestion
+from app.database.models import QuizAnswer, QuizQuestion
 from app.database.repositories.quiz_repo import QuizRepository
 from app.database.repositories.user_repo import UserRepository
 from app.services.quiz_service import QuizService
@@ -308,6 +308,27 @@ async def answer_chosen(call: CallbackQuery, session, user):
     )
     await call.message.edit_text(body, reply_markup=feedback_keyboard(quiz_id, finished))
     await call.answer()
+
+
+@router.callback_query(F.data.startswith("qnext:skip:"))
+async def skip_question(call: CallbackQuery, session, user):
+    question_id = int(call.data.split(":")[2])
+    question = await session.get(QuizQuestion, question_id)
+    if question is None:
+        await call.answer("Question not found", show_alert=True)
+        return
+    session.add(
+        QuizAnswer(
+            user_id=user.id,
+            quiz_id=question.quiz_id,
+            question_id=question_id,
+            chosen_index=-1,
+            is_correct=None,
+        )
+    )
+    await session.flush()
+    await show_question(call, session, question.quiz_id)
+    await call.answer("Skipped ⏭")
 
 
 @router.callback_query(F.data.startswith("qnext:"))

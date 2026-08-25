@@ -67,7 +67,10 @@ async def level_chosen(call: CallbackQuery, state: FSMContext):
         "Now send me your question. You can keep asking follow-ups.\n"
         "Example: <i>\"Explain TCP/IP like I'm a beginner.\"</i>",
         reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[InlineKeyboardButton(text="❌ Done", callback_data="ask:done")]]
+            inline_keyboard=[
+                [InlineKeyboardButton(text="❌ Done", callback_data="ask:done")],
+                [InlineKeyboardButton(text="🏠 Menu", callback_data="menu:main")],
+            ]
         ),
     )
     await call.answer()

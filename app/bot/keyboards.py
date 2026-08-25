@@ -110,6 +110,12 @@ def answer_keyboard(question: QuizQuestion) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text=f"{labels[i]} {choice}", callback_data=f"qans:{question.id}:{i}")]
         for i, choice in enumerate(question.choices)
     ]
+    rows.append(
+        [
+            InlineKeyboardButton(text="⏭ Skip", callback_data=f"qnext:skip:{question.quiz_id}"),
+            InlineKeyboardButton(text="🏠 Menu", callback_data="menu:main"),
+        ]
+    )
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 

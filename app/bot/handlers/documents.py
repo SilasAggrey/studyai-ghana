@@ -195,7 +195,8 @@ async def doc_ask_start(call: CallbackQuery, state: FSMContext, session):
         "Example: <i>\"Explain the key formulas.\"</i>",
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text="✅ Done", callback_data="doc:askdone")]
+                [InlineKeyboardButton(text="✅ Done", callback_data="doc:askdone")],
+                [InlineKeyboardButton(text="🏠 Menu", callback_data="menu:main")],
             ]
         ),
     )
@@ -236,7 +237,8 @@ async def doc_ask_question(message: Message, state: FSMContext, session, user):
         "💡 Ask a follow-up about the notes, or press Done.",
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text="✅ Done", callback_data="doc:askdone")]
+                [InlineKeyboardButton(text="✅ Done", callback_data="doc:askdone")],
+                [InlineKeyboardButton(text="🏠 Menu", callback_data="menu:main")],
             ]
         ),
     )

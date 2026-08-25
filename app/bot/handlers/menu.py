@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from datetime import date, datetime
 
+from app.bot.common import cancel_row
 from app.bot.keyboards import (
     main_menu,
     exam_keyboard,
@@ -230,7 +231,10 @@ async def cmd_flashcards(message: Message, state: FSMContext, session, user):
 async def fc_add_start(call: CallbackQuery, state: FSMContext):
     await state.set_state(FlashcardFlow.adding_front)
     await state.update_data(fc_front=None, fc_back=None, fc_subject=None)
-    await call.message.edit_text("➕ <b>New flashcard</b>\n\nType the <b>front</b> (the question or term):")
+    await call.message.edit_text(
+        "➕ <b>New flashcard</b>\n\nType the <b>front</b> (the question or term):",
+        reply_markup=cancel_row(),
+    )
     await call.answer()
 
 
@@ -238,14 +242,14 @@ async def fc_add_start(call: CallbackQuery, state: FSMContext):
 async def fc_add_front(message: Message, state: FSMContext):
     await state.update_data(fc_front=message.text.strip())
     await state.set_state(FlashcardFlow.adding_back)
-    await message.answer("✍️ Now type the <b>back</b> (the answer or definition):")
+    await message.answer("✍️ Now type the <b>back</b> (the answer or definition):", reply_markup=cancel_row())
 
 
 @router.message(FlashcardFlow.adding_back, F.text)
 async def fc_add_back(message: Message, state: FSMContext):
     await state.update_data(fc_back=message.text.strip())
     await state.set_state(FlashcardFlow.adding_subject)
-    await message.answer("🏷 Optional: type a <b>subject</b> (or send /skip):")
+    await message.answer("🏷 Optional: type a <b>subject</b> (or send /skip):", reply_markup=cancel_row())
 
 
 @router.message(FlashcardFlow.adding_subject, F.text)
@@ -428,7 +432,8 @@ async def sp_create_start(call: CallbackQuery, state: FSMContext):
     await state.set_state(StudyPlanFlow.exam_date)
     await call.message.edit_text(
         "🎯 <b>Create Study Plan</b>\n\n"
-        "When is your exam? Send the date as <b>YYYY-MM-DD</b> (or send /skip if unsure)."
+        "When is your exam? Send the date as <b>YYYY-MM-DD</b> (or send /skip if unsure).",
+        reply_markup=cancel_row(),
     )
     await call.answer()
 
@@ -441,11 +446,11 @@ async def sp_exam_date(message: Message, state: FSMContext):
         try:
             exam_date = date.fromisoformat(text)
         except ValueError:
-            await message.answer("⚠️ Invalid date. Use YYYY-MM-DD or send /skip.")
+            await message.answer("⚠️ Invalid date. Use YYYY-MM-DD or send /skip.", reply_markup=cancel_row())
             return
     await state.update_data(sp_exam_date=exam_date)
     await state.set_state(StudyPlanFlow.daily_hours)
-    await message.answer("⏰ How many hours per day can you study? (e.g. 2)")
+    await message.answer("⏰ How many hours per day can you study? (e.g. 2)", reply_markup=cancel_row())
 
 
 @router.message(StudyPlanFlow.daily_hours, F.text)
@@ -456,11 +461,11 @@ async def sp_daily_hours(message: Message, state: FSMContext):
         if hours <= 0:
             raise ValueError
     except ValueError:
-        await message.answer("⚠️ Please send a positive number of hours (e.g. 2).")
+        await message.answer("⚠️ Please send a positive number of hours (e.g. 2).", reply_markup=cancel_row())
         return
     await state.update_data(sp_daily_hours=hours)
     await state.set_state(StudyPlanFlow.subjects)
-    await message.answer("📚 Which subjects? Comma-separated (e.g. Math, Physics, Biology):")
+    await message.answer("📚 Which subjects? Comma-separated (e.g. Math, Physics, Biology):", reply_markup=cancel_row())
 
 
 @router.message(StudyPlanFlow.subjects, F.text)
