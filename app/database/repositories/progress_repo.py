@@ -123,6 +123,28 @@ class ProgressRepository:
         result = await self.session.execute(select(User.streak_days).where(User.id == user_id))
         return result.scalar_one() or 0
 
+    async def top_students(self, limit: int = 10) -> list[tuple[int, str, int, int, int]]:
+        """Top students by XP who opted into the leaderboard.
+
+        Returns (uid, display_name, xp, level, streak_days) tuples.
+        """
+        result = await self.session.execute(
+            select(
+                User.id,
+                User.display_name,
+                User.xp,
+                User.level,
+                User.streak_days,
+            )
+            .where(User.is_active.is_(True), User.leaderboard_opt_in.is_(True))
+            .order_by(User.xp.desc())
+            .limit(limit)
+        )
+        return [
+            (int(uid), name or f"Student{uid}", int(xp), int(lv), int(streak))
+            for uid, name, xp, lv, streak in result.all()
+        ]
+
     async def ai_usage_today(self, user_id: int) -> int:
         from app.database.models import AiUsage
 

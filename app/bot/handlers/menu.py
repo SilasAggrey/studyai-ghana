@@ -55,10 +55,24 @@ async def menu_notes(call: CallbackQuery):
 
 
 @router.callback_query(F.data == "menu:leaderboard")
-async def menu_leaderboard(call: CallbackQuery):
+async def menu_leaderboard(call: CallbackQuery, state: FSMContext, session, user):
+    await state.clear()
+    from app.database.repositories.progress_repo import ProgressRepository
+
+    rows = await ProgressRepository(session).top_students(limit=10)
+    medals = ["🥇", "🥈", "🥉"]
+    lines = []
+    for idx, (uid, name, xp, level, streak) in enumerate(rows, start=1):
+        medal = medals[idx - 1] if idx <= 3 else f"{idx}."
+        lines.append(f"{medal} <b>{name}</b> · Level {level} · {xp} XP · 🔥{streak}d")
+    if not lines:
+        lines.append("🤔 No one has joined the leaderboard yet. "
+                     "Enable visibility in ⚙️ Settings to rank up!")
+    your_rank_in = [i for i, (uid, *_ ) in enumerate(rows, start=1) if uid == user.id]
+    your_line = f"\n\n📍 Your rank: <b>#{your_rank_in[0]}</b>" if your_rank_in else ""
     await call.message.edit_text(
-        "🏆 <b>Leaderboard</b>\n\nThis feature is part of <b>Phase 3</b>. "
-        "Weekly and monthly rankings are on the way.",
+        "🏆 <b>All-Time Leaderboard</b>\n\n" + "\n".join(lines) + your_line
+        + "\n\n<i>Turn on 'Leaderboard visibility' in Settings to appear here.</i>",
         reply_markup=back_to_menu_keyboard(),
     )
     await call.answer()
