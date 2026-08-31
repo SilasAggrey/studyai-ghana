@@ -29,10 +29,17 @@ async def health():
 async def webhook(secret: str, request: Request):
     """Telegram webhook receiver."""
     settings = get_settings()
-    if settings.WEBHOOK_SECRET and secret != settings.WEBHOOK_SECRET:
-        from fastapi import HTTPException
+    if settings.WEBHOOK_SECRET:
+        if secret != settings.WEBHOOK_SECRET:
+            from fastapi import HTTPException
 
-        raise HTTPException(status_code=403, detail="Invalid secret")
+            raise HTTPException(status_code=403, detail="Invalid secret")
+        # Telegram sends the same secret in this header on every webhook call.
+        token = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
+        if token != settings.WEBHOOK_SECRET:
+            from fastapi import HTTPException
+
+            raise HTTPException(status_code=403, detail="Missing secret header")
     if not getattr(request.app.state, "bot", None):
         from fastapi import HTTPException
 

@@ -16,6 +16,10 @@ services:
         sync: false
       - key: AI_PROVIDER
         value: gemini
+      - key: AI_MODEL_FAST
+        value: gemini-3.6-flash
+      - key: AI_MODEL_STRONG
+        value: gemini-3.5-flash
       - key: AI_API_KEY
         sync: false
       - key: WEBHOOK_SECRET

@@ -147,11 +147,13 @@ class QuizService:
             topic = (question.topic if question else quiz.topic) or quiz.subject
             if ans.is_correct:
                 topics_correct[topic] = topics_correct.get(topic, 0) + 1
-            else:
+            elif ans.is_correct is False:
+                # Skipped answers (is_correct=None) are excluded from topic analysis.
                 topics_incorrect[topic] = topics_incorrect.get(topic, 0) + 1
 
         strong = sorted(topics_correct.items(), key=lambda kv: -kv[1])[:3]
         weak = sorted(topics_incorrect.items(), key=lambda kv: -kv[1])[:3]
+        skipped = sum(1 for a in answers if a.is_correct is None)
 
         return {
             "quiz": quiz,
@@ -160,7 +162,9 @@ class QuizService:
             "accuracy": accuracy,
             "strong_topics": [t for t, _ in strong],
             "weak_topics": [t for t, _ in weak],
-            "correct_answers": len(answers),
+            "correct_answers": correct,
+            "answered": len(answers),
+            "skipped": skipped,
         }
 
     async def weak_topics_for_user(self, user_id: int, limit: int = 3) -> list[str]:

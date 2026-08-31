@@ -13,6 +13,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 from app.ai.base import AIProviderError
 from app.ai.prompts.document import cap_material
 from app.bot.common import reply_markdown
+from app.config import get_settings
 from app.bot.keyboards import (
     doc_count_keyboard,
     doc_difficulty_keyboard,
@@ -92,6 +93,10 @@ async def on_document(message: Message, session, user, state: FSMContext):
         await message.answer("⚠️ Couldn't download that file. Please try again.")
         return
 
+    settings = get_settings()
+    max_pages = (
+        settings.PREMIUM_MAX_DOCUMENT_PAGES if user.is_premium else settings.FREE_MAX_DOCUMENT_PAGES
+    )
     stored = await DocumentService(session).store_document(
         user.id,
         filename=doc.file_name or "document",
@@ -100,6 +105,7 @@ async def on_document(message: Message, session, user, state: FSMContext):
         size_bytes=doc.file_size or 0,
         data=data,
         title=doc.file_name,
+        max_pages=max_pages,
     )
     await session.commit()
 

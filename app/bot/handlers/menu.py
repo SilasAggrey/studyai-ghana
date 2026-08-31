@@ -143,15 +143,13 @@ async def exam_answer(call: CallbackQuery, state: FSMContext, session, user):
     question_index = data.get("question_index", 0)
     answer = call.data.replace("exam:answer:", "")
 
-    question = get_question(question_index)
+    question = get_question(question_index + 1)
     if question is None:
         await show_exam_results(call, state, session, user)
         return
 
     if answer == question["correct"]:
         await state.update_data(score=data.get("score", 0) + 1)
-    else:
-        await state.update_data(wrong=data.get("wrong", 0) + 1)
 
     await state.update_data(question_index=question_index + 1)
     await show_exam_question(call, state, session, user)
@@ -168,24 +166,23 @@ async def exam_skip(call: CallbackQuery, state: FSMContext, session, user):
 
 async def show_exam_question(call: CallbackQuery, state: FSMContext, session, user):
     data = await state.get_data()
-    index = data.get("question_index", 0)
-    if index >= TOTAL_QUESTIONS:
+    question_index = data.get("question_index", 0)
+    if question_index >= TOTAL_QUESTIONS:
         await show_exam_results(call, state, session, user)
         return
-    question = get_question(index + 1)
+    question = get_question(question_index + 1)
     if question is None:
         await show_exam_results(call, state, session, user)
         return
     await state.set_state(Exam.started)
-    await state.update_data(question_index=index + 1)
     choices = question.get("choices", {})
     choices_text = "\n".join(f"{k}. {v}" for k, v in choices.items())
     question_text = (
-        f"📝 Mock Exam Question {index + 1} of {TOTAL_QUESTIONS}\n\n"
+        f"📝 Mock Exam Question {question_index + 1} of {TOTAL_QUESTIONS}\n\n"
         f"{question['question']}\n\n"
         f"{choices_text}"
     )
-    await call.message.edit_text(question_text, reply_markup=exam_keyboard(index + 1, TOTAL_QUESTIONS))
+    await call.message.edit_text(question_text, reply_markup=exam_keyboard(question_index + 1, TOTAL_QUESTIONS))
     await call.answer()
 
 
@@ -382,7 +379,10 @@ async def fc_rate(call: CallbackQuery, state: FSMContext, session, user):
 @router.callback_query(F.data == "fc:stop")
 async def fc_stop(call: CallbackQuery, state: FSMContext):
     await state.clear()
-    await call.message.edit_text("⏹ Review stopped.", reply_markup=flashcard_menu_keyboard(0, 0))
+    await call.message.edit_text(
+        "⏹ Review stopped.",
+        reply_markup=main_menu(),
+    )
     await call.answer()
 
 

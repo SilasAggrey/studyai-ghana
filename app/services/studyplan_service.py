@@ -25,16 +25,20 @@ class StudyPlanService:
         subjects = plan.subjects or ["General revision"]
         if not subjects:
             return []
+        today = date.today()
+        if plan.exam_date and plan.exam_date <= today:
+            # Exam already passed or is today: no forward-looking schedule.
+            return []
         days_until = 30
         if plan.exam_date:
-            delta = (plan.exam_date - date.today()).days
+            delta = (plan.exam_date - today).days
             days_until = max(1, delta)
         schedule = []
-        for day in range(min(days_until, 14)):
+        for day in range(days_until):
             subject = subjects[day % len(subjects)]
             schedule.append(
                 {
-                    "day": (date.today() + timedelta(days=day + 1)).isoformat(),
+                    "day": (today + timedelta(days=day + 1)).isoformat(),
                     "subject": subject,
                     "hours": plan.daily_hours,
                     "focus": f"Cover core {subject} topics; do a short quiz to test recall.",

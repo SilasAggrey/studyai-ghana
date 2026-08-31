@@ -70,6 +70,7 @@ async def start_quiz(message: Message, state: FSMContext, session, user):
 
     subjects = await _load_quiz_subjects(session, user)
     await state.set_state(QuizSetup.subject)
+    await state.update_data(step="subject")
     await message.answer(
         "🧠 <b>Generate a Quiz</b>\n\nPick a subject or type your own:",
         reply_markup=subject_keyboard(subjects, subjects[:6]),
@@ -88,6 +89,7 @@ async def quiz_from_menu(call: CallbackQuery, state: FSMContext, session, user):
 
     subjects = await _load_quiz_subjects(session, user)
     await state.set_state(QuizSetup.subject)
+    await state.update_data(step="subject")
     await call.message.edit_text(
         "🧠 <b>Generate a Quiz</b>\n\nPick a subject or type your own:",
         reply_markup=subject_keyboard(subjects, subjects[:6]),
@@ -128,6 +130,7 @@ async def quiz_back(call: CallbackQuery, state: FSMContext, session, user):
 async def start_quiz_from_call(call: CallbackQuery, state: FSMContext, session, user):
     subjects = await _load_quiz_subjects(session, user)
     await state.set_state(QuizSetup.subject)
+    await state.update_data(step="subject")
     await call.message.edit_text(
         "🧠 <b>Generate a Quiz</b>\n\nPick a subject or type your own:",
         reply_markup=subject_keyboard(subjects, subjects[:6]),
@@ -294,7 +297,7 @@ async def answer_chosen(call: CallbackQuery, session, user):
     finished = len(answered) >= total
 
     if feedback["is_correct"]:
-        header = f"✅ <b>Correct!</b> (+2 XP)"
+        header = "✅ <b>Correct!</b>"
     else:
         correct_text = _fmt_choice(feedback["correct_index"], question.choices[feedback["correct_index"]])
         header = f"❌ <b>Incorrect.</b>\nCorrect answer: {correct_text}"
@@ -359,8 +362,11 @@ async def _finalize(call: CallbackQuery, session, quiz_id: int):
         "🎯 <b>QUIZ COMPLETE</b>\n"
         "━━━━━━━━━━━━━━━━\n\n"
         f"Score: <b>{result['score']}/{result['total']}</b>\n"
-        f"Accuracy: <b>{result['accuracy']}%</b>\n\n"
+        f"Accuracy: <b>{result['accuracy']}%</b>\n"
+        f"⚡ XP earned: <b>+{result['score'] * 2}</b>\n\n"
     )
+    if result.get("skipped"):
+        body += f"⏭ Skipped: {result['skipped']}\n\n"
     if result["strong_topics"]:
         body += "💪 <b>Strong topics</b>\n" + "".join(
             f"• {t}\n" for t in result["strong_topics"]

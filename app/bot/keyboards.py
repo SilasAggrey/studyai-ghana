@@ -112,7 +112,7 @@ def answer_keyboard(question: QuizQuestion) -> InlineKeyboardMarkup:
     ]
     rows.append(
         [
-            InlineKeyboardButton(text="⏭ Skip", callback_data=f"qnext:skip:{question.quiz_id}"),
+            InlineKeyboardButton(text="⏭ Skip", callback_data=f"qnext:skip:{question.id}"),
             InlineKeyboardButton(text="🏠 Menu", callback_data="menu:main"),
         ]
     )

@@ -114,10 +114,12 @@ def extract_pptx_text(data: bytes) -> tuple[str, int]:
     return "\n".join(parts), len(prs.slides)
 
 
-def extract_text(data: bytes, file_type: str) -> tuple[str, int]:
+def extract_text(
+    data: bytes, file_type: str, max_pages: int | None = None
+) -> tuple[str, int]:
     """Dispatch extraction by file extension. Returns (text, page_count)."""
     if file_type == "pdf":
-        return extract_pdf_text(data)
+        return extract_pdf_text(data, max_pages=max_pages)
     if file_type in TEXT_FILE_TYPES:
         return extract_txt_text(data)
     if file_type in ("docx",):
@@ -168,6 +170,7 @@ class DocumentService:
         size_bytes: int,
         data: bytes | None = None,
         title: str | None = None,
+        max_pages: int | None = None,
     ) -> object:
         from app.database.models import Document
 
@@ -180,7 +183,7 @@ class DocumentService:
         )
         if data is not None:
             try:
-                text, page_count = extract_text(data, file_type)
+                text, page_count = extract_text(data, file_type, max_pages=max_pages)
                 status = "processed"
             except ValueError as exc:
                 status = "failed"

@@ -17,10 +17,17 @@ EDU_LABELS = {
     "professional": "🎖 Professional",
 }
 
+# Type-appropriate level prompts
+LEVEL_PROMPTS = {
+    "university": "📅 <b>What level are you in?</b>\n\nType it (e.g. Level 100, Semester 1, Year 1).",
+    "shs": "📅 <b>What level are you in?</b>\n\nType it (e.g. SHS 1, SHS 2, SHS 3).",
+    "professional": "📅 <b>What level are you in?</b>\n\nType it (e.g. Certificate, Diploma, Advanced).",
+}
+
 PROMPTS = {
-    "school": "🏫 <b>Which school do you attend?</b>\n\nType the name (e.g. University of Ghana, Presec Legon).",
-    "level": "📅 <b>What level are you in?</b>\n\nType it (e.g. Year 2, Semester 1, SHS 3).",
-    "program": "🎯 <b>What program are you studying?</b>\n\nType it (e.g. Computer Science, General Arts).",
+    "school": "🏫 <b>Which school do you attend?</b>\n\nType the name (e.g. University of Ghana, Presec Legon, SHS).",
+    "level": lambda edu_type: LEVEL_PROMPTS.get(edu_type, LEVEL_PROMPTS["university"]),
+    "program": "🎯 <b>What program are you studying?</b>\n\nType it (e.g. Computer Science, General Arts, Business).",
     "subjects": "📖 <b>Which subjects are you studying?</b>\n\nList them separated by commas.\n\nExample: <i>Computer Networks, Operating Systems, Databases</i>",
 }
 
@@ -40,8 +47,10 @@ async def edu_chosen(call: CallbackQuery, state: FSMContext, session, user):
     edu = call.data.split(":")[1]
     await state.update_data(education_type=edu)
     await state.set_state(Onboarding.school)
+    # Show type-appropriate school prompt
+    school_prompt = "🏫 <b>Which school do you attend?</b>\n\nType the name (e.g. University of Ghana, Presec Legon, SHS)."
     await call.message.edit_text(
-        f"{EDU_LABELS[edu]} selected. ✅\n\n" + PROMPTS["school"],
+        f"{EDU_LABELS[edu]} selected. ✅\n\n" + school_prompt,
         reply_markup=cancel_row(),
     )
     await call.answer()
@@ -51,7 +60,11 @@ async def edu_chosen(call: CallbackQuery, state: FSMContext, session, user):
 async def school_entered(message: Message, state: FSMContext):
     await state.update_data(school_name=message.text.strip())
     await state.set_state(Onboarding.level)
-    await message.answer(PROMPTS["level"], reply_markup=cancel_row())
+    # Get education type from state to show appropriate level prompt
+    data = await state.get_data()
+    edu_type = data.get("education_type", "university")
+    level_prompt = LEVEL_PROMPTS.get(edu_type, LEVEL_PROMPTS["university"])
+    await message.answer(level_prompt, reply_markup=cancel_row())
 
 
 @router.message(Onboarding.level, F.text)
@@ -90,9 +103,11 @@ async def subjects_entered(message: Message, state: FSMContext, session, user):
 
     await message.answer(
         f"✅ <b>Profile complete!</b>\n\n"
+
         f"🎓 {EDU_LABELS.get(profile.education_type, profile.education_type)}\n"
         f"🏫 {profile.school_name or '—'}\n"
         f"📖 {', '.join(profile.subjects)}\n\n"
+
         f"Let's start studying! 🚀",
         reply_markup=main_menu(),
     )

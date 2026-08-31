@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     BOT_MODE: str = "polling"
     WEBHOOK_URL: str = ""
     WEBHOOK_SECRET: str = ""
-    BOT_USERNAME: str = "StudyAIGhanaBot"
+    BOT_USERNAME: str = "StudyAiGHbot"
 
     # --- Render auto-detect ---
     RENDER_EXTERNAL_URL: str = ""

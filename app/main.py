@@ -46,6 +46,7 @@ async def _init_database() -> None:
 async def run_polling() -> None:
     from aiogram.exceptions import TelegramUnauthorizedError
 
+    await _init_database()
     bot = build_bot()
     dp = build_dispatcher()
     logger.info("Starting StudyAI Ghana bot (polling mode)...")
