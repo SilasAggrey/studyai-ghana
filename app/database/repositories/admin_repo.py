@@ -1,10 +1,33 @@
 """Admin analytics repository."""
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import AiUsage, Quiz, QuizAnswer, User
+
+_RESET_TABLES = [
+    "topic_progress",
+    "user_achievements",
+    "notifications",
+    "payments",
+    "subscriptions",
+    "study_sessions",
+    "study_plans",
+    "flashcards",
+    "document_chunks",
+    "documents",
+    "exam_answers",
+    "exam_questions",
+    "exams",
+    "quiz_answers",
+    "quiz_questions",
+    "quizzes",
+    "referrals",
+    "activities",
+    "ai_usage",
+    "student_profiles",
+]
 
 
 class AdminRepository:
@@ -39,3 +62,14 @@ class AdminRepository:
             "ai_requests": ai_requests.scalar_one() or 0,
             "ai_cost": float(ai_cost.scalar_one() or 0.0),
         }
+
+    async def reset_all_users(self) -> int:
+        for table in _RESET_TABLES:
+            try:
+                await self.session.execute(text(f"DELETE FROM {table}"))
+            except Exception:
+                pass
+        await self.session.execute(text("DELETE FROM users"))
+        await self.session.commit()
+        remaining = await self.session.execute(select(func.count(User.id)))
+        return remaining.scalar_one() or 0

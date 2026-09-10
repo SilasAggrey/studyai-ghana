@@ -48,6 +48,21 @@ async def cmd_stats(message: Message, session, user):
     await message.answer(text)
 
 
+@router.message(Command("resetusers"))
+async def cmd_reset_users(message: Message, command: CommandObject, session, user):
+    if await _denied(message, user):
+        return
+    if (command.args or "").strip().lower() != "confirm":
+        await message.answer(
+            "⚠️ <b>This wipes ALL users and their data</b> (profiles, quizzes, progress, AI usage).\n"
+            "Universities/subjects/curriculum are kept.\n\n"
+            "To proceed, send: <code>/resetusers confirm</code>"
+        )
+        return
+    remaining = await AdminRepository(session).reset_all_users()
+    await message.answer(f"✅ Reset done. Users remaining: <b>{remaining}</b>")
+
+
 @router.message(Command("grant"))
 async def cmd_grant(message: Message, command: CommandObject, session, user):
     if await _denied(message, user):
