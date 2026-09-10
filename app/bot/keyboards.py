@@ -20,6 +20,10 @@ MENU_ROW4 = [
     InlineKeyboardButton(text="🏆 Leaderboard", callback_data="menu:leaderboard"),
 ]
 MENU_ROW5 = [
+    InlineKeyboardButton(text="🎓 Curriculum", callback_data="menu:curriculum"),
+    InlineKeyboardButton(text="🧠 Generate Topics", callback_data="cur:topics"),
+]
+MENU_ROW6 = [
     InlineKeyboardButton(text="💎 Premium", callback_data="menu:premium"),
     InlineKeyboardButton(text="⚙️ Settings", callback_data="menu:settings"),
 ]
@@ -27,7 +31,14 @@ MENU_ROW5 = [
 
 def main_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
-        inline_keyboard=[MENU_ROW1, MENU_ROW2, MENU_ROW3, MENU_ROW4, MENU_ROW5]
+        inline_keyboard=[
+            MENU_ROW1,
+            MENU_ROW2,
+            MENU_ROW3,
+            MENU_ROW4,
+            MENU_ROW5,
+            MENU_ROW6,
+        ]
     )
 
 
@@ -330,6 +341,101 @@ def back_to_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🏠 Main Menu", callback_data="menu:main")]
+        ]
+    )
+
+
+def _grid(items: list[tuple[str, str]], per_row: int = 2) -> list[list[InlineKeyboardButton]]:
+    rows: list[list[InlineKeyboardButton]] = []
+    for i in range(0, len(items), per_row):
+        rows.append(
+            [
+                InlineKeyboardButton(text=label, callback_data=data)
+                for label, data in items[i : i + per_row]
+            ]
+        )
+    return rows
+
+
+def curriculum_type_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="📚 SHS", callback_data="cur:type:shs")],
+            [InlineKeyboardButton(text="🎓 University / Tertiary", callback_data="cur:type:university")],
+        ]
+    )
+
+
+def shs_class_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="SHS 1", callback_data="cur:shsclass:SHS 1"),
+                InlineKeyboardButton(text="SHS 2", callback_data="cur:shsclass:SHS 2"),
+            ],
+            [InlineKeyboardButton(text="SHS 3", callback_data="cur:shsclass:SHS 3")],
+            [InlineKeyboardButton(text="⬅️ Back", callback_data="cur:back")],
+        ]
+    )
+
+
+def choice_keyboard(
+    items: list[tuple[int, str]],
+    prefix: str,
+    *,
+    back: str = "cur:back",
+    per_row: int = 2,
+) -> InlineKeyboardMarkup:
+    """Generic picker: items are (id, label) tuples."""
+    rows = _grid([(label[:60], f"{prefix}:{item_id}") for item_id, label in items], per_row)
+    rows.append([InlineKeyboardButton(text="⬅️ Back", callback_data=back)])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def multi_select_keyboard(
+    items: list[tuple[int, str]],
+    prefix: str,
+    selected: set[int],
+    *,
+    done_cb: str = "cur:shs_done",
+) -> InlineKeyboardMarkup:
+    rows = _grid(
+        [
+            (f"{'✅ ' if item_id in selected else ''}{label[:50]}", f"{prefix}:{item_id}")
+            for item_id, label in items
+        ],
+        2,
+    )
+    rows.append([InlineKeyboardButton(text="✅ Done", callback_data=done_cb)])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def topic_actions_keyboard(topic_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="📖 Learn", callback_data=f"cur:learn:{topic_id}"),
+                InlineKeyboardButton(text="🧠 Quiz", callback_data=f"cur:quiz:{topic_id}"),
+            ],
+            [
+                InlineKeyboardButton(text="📝 Mock Exam", callback_data=f"cur:exam:{topic_id}"),
+                InlineKeyboardButton(text="🗂 Flashcards", callback_data=f"cur:fc:{topic_id}"),
+            ],
+            [
+                InlineKeyboardButton(text="⚡ Quick Study", callback_data=f"cur:quick:{topic_id}"),
+                InlineKeyboardButton(text="📚 Ask AI", callback_data=f"cur:ask:{topic_id}"),
+            ],
+            [InlineKeyboardButton(text="🏠 Main Menu", callback_data="menu:main")],
+        ]
+    )
+
+
+def curriculum_topics_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="📚 Curriculum Topics", callback_data="cur:topics:curriculum")],
+            [InlineKeyboardButton(text="🤖 AI Suggested Topics", callback_data="cur:topics:ai")],
+            [InlineKeyboardButton(text="🏠 Main Menu", callback_data="menu:main")],
         ]
     )
 

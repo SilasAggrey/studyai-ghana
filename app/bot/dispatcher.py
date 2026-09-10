@@ -11,6 +11,7 @@ from redis.asyncio import from_url
 from app.bot.handlers import (
     admin,
     ask,
+    curriculum,
     documents,
     errors,
     menu,
@@ -64,6 +65,7 @@ def build_dispatcher() -> Dispatcher:
         profile.router,
         menu.router,
         ask.router,
+        curriculum.router,
         quiz.router,
         progress.router,
         settings.router,

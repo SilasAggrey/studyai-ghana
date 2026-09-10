@@ -10,6 +10,23 @@ class Onboarding(StatesGroup):
     subjects = State()
 
 
+class Curriculum(StatesGroup):
+    """Structured SHS + university curriculum navigation (DB-driven)."""
+
+    # SHS
+    shs_class = State()
+    shs_programme = State()
+    shs_subjects = State()
+    # University
+    university = State()
+    department = State()
+    programme = State()
+    level = State()
+    semester = State()
+    course = State()
+    topic = State()
+
+
 class AskAI(StatesGroup):
     # stores chosen explanation level in state data
     waiting_question = State()

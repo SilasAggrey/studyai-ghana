@@ -26,4 +26,27 @@ class StudentProfile(Base, TimestampMixin):
     exam_date: Mapped[str | None] = mapped_column(String(32))
     onboarded: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    # Structured curriculum links (nullable; free-text level/program kept for
+    # backward compatibility). SHS uses shs_class + shs_programme_id.
+    shs_class: Mapped[str | None] = mapped_column(String(20))
+    shs_programme_id: Mapped[int | None] = mapped_column(
+        ForeignKey("programmes.id", ondelete="SET NULL"), index=True
+    )
+    # University uses the full hierarchy below.
+    university_programme_id: Mapped[int | None] = mapped_column(
+        ForeignKey("programmes.id", ondelete="SET NULL"), index=True
+    )
+    department_id: Mapped[int | None] = mapped_column(
+        ForeignKey("departments.id", ondelete="SET NULL"), index=True
+    )
+    programme_level_id: Mapped[int | None] = mapped_column(
+        ForeignKey("programme_levels.id", ondelete="SET NULL"), index=True
+    )
+    semester_id: Mapped[int | None] = mapped_column(
+        ForeignKey("semesters.id", ondelete="SET NULL"), index=True
+    )
+    course_id: Mapped[int | None] = mapped_column(
+        ForeignKey("courses.id", ondelete="SET NULL"), index=True
+    )
+
     user = relationship("User", back_populates="profile")

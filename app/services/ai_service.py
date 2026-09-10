@@ -251,6 +251,7 @@ class AIService:
         from sqlalchemy import select
 
         from app.database.models import StudentProfile
+        from app.services.curriculum_service import CurriculumService
 
         result = await self.session.execute(
             select(StudentProfile).where(StudentProfile.user_id == user_id)
@@ -258,6 +259,18 @@ class AIService:
         profile = result.scalar_one_or_none()
         if profile is None:
             return ""
+        # Prefer the structured curriculum context when available.
+        if (
+            profile.shs_programme_id
+            or profile.university_programme_id
+            or profile.course_id
+        ):
+            try:
+                structured = await CurriculumService(self.session).academic_context(user_id)
+                if structured:
+                    return structured
+            except Exception:
+                logger.warning("curriculum context lookup failed", exc_info=True)
         parts = [
             f"Education level: {profile.education_type}",
             f"School: {profile.school_name or 'unspecified'}",

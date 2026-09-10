@@ -27,6 +27,11 @@ worldwide.
 | Referral system with rewards + anti-abuse checks | ✅ Phase 1 |
 | `/stats`, `/grant`, `/revoke` admin commands (role-gated) | ✅ Phase 1 |
 | `/notes` — upload PDF/TXT/DOCX/MD → summarize, quiz from material, ask, study guide | ✅ Phase 2 (partial) |
+| 🎓 Ghana curriculum: SHS (class → programme → subjects) & University (university → department → programme → level → semester → course → topic → subtopic) | ✅ New |
+| 🧠 Generate Topics — verified Curriculum Topics + AI Suggested Topics (labelled as AI, not official) | ✅ New |
+| Academic context fed to Ask AI / quiz / exams / flashcards | ✅ New |
+| Per-topic mastery tracking (`topic_progress`) and mastery shown on `/progress` | ✅ New |
+| JSON/CSV curriculum import (`app/database/curriculum_import.py`) | ✅ New |
 | Mock exams, photo/OCR notes, flashcards, study plans | 🔜 Phase 2 |
 | Leaderboard, payments (Telegram Stars), admin web panel | 🔜 Phase 3 |
 | Telegram Mini App dashboard | 🔜 Phase 4 |
@@ -85,6 +90,23 @@ studyai-ghana/
 `documents`, `document_chunks`, `flashcards`, `study_plans`, `study_sessions`,
 `subscriptions`, `payments`, `referrals`, `achievements`, `user_achievements`,
 `activities`, `ai_usage`, `admin_logs`, `notifications`.
+
+**Curriculum hierarchy (new):** `departments`, `programmes`, `programme_levels`,
+`semesters`, `courses`, `subject_programmes`, `topic_progress`. `topics` gained
+`course_id` + `parent_topic_id` (nested subtopics); `student_profiles` gained
+structured curriculum FKs while keeping the legacy free-text `level`/`program`.
+
+### Curriculum import
+
+Curricula are **data, not code**. Import verified data with:
+
+```powershell
+python -m app.database.curriculum_import scripts\curriculum_sample.json
+```
+
+The JSON is flagged `"verified": true|false`. `scripts/curriculum_sample.json`
+is **SAMPLE / UNVERIFIED** demo data only — it is never presented as official.
+The importer is idempotent (safe to re-run).
 
 ## 🚀 Getting started
 
@@ -149,7 +171,7 @@ client is never trusted.
 
 Commands: `/start` `/help` `/profile` `/ask` `/quiz` `/exam` `/notes`
 `/flashcards` `/studyplan` `/progress` `/history` `/leaderboard` `/premium`
-`/settings` `/cancel`
+`/settings` `/curriculum` `/cancel`
 
 Most actions are available through the **main menu** inline buttons — no need
 to type commands.
@@ -177,7 +199,9 @@ Covers: user registration, profile setup, quiz generation & scoring, answer
 idempotency, daily/plan limits, progress aggregation, referral attribution &
 rewards & anti-abuse, premium grant/expiry, admin authorization, rate
 limiting, AI JSON parsing, provider-failure handling, cost estimation, PDF
-text extraction & chunking, exam scoring.
+text extraction & chunking, exam scoring, curriculum hierarchy persistence &
+unique constraints, SHS & university profile linking + AI context, per-topic
+mastery updates after a quiz, AI topic suggestion parsing.
 
 ## 🔜 Phase 2 roadmap
 

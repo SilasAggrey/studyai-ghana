@@ -33,5 +33,19 @@ class Topic(Base, TimestampMixin):
     subject_id: Mapped[int | None] = mapped_column(
         ForeignKey("subjects.id", ondelete="SET NULL")
     )
+    # University curriculum topics belong to a course; SHS/legacy topics may not.
+    course_id: Mapped[int | None] = mapped_column(
+        ForeignKey("courses.id", ondelete="CASCADE"), index=True
+    )
+    # Nested topics: a subtopic points at its parent topic.
+    parent_topic_id: Mapped[int | None] = mapped_column(
+        ForeignKey("topics.id", ondelete="CASCADE"), index=True
+    )
     name: Mapped[str] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "course_id", "parent_topic_id", "name", name="uq_topic_course_parent_name"
+        ),
+    )

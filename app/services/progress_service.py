@@ -29,6 +29,19 @@ class ProgressService:
         quiz_service = QuizService(self.session)
         recommended_topic = (await quiz_service.weak_topics_for_user(user_id, 1) or [None])[0]
 
+        from app.database.repositories.curriculum_repo import CurriculumRepository
+
+        weak_progress = await CurriculumRepository(self.session).weak_topic_progress(user_id, 5)
+        curriculum_weak = []
+        if weak_progress:
+            repo = CurriculumRepository(self.session)
+            for tp in weak_progress:
+                topic = await repo.get_topic(tp.topic_id)
+                if topic is not None:
+                    curriculum_weak.append(
+                        {"topic": topic.name, "mastery": round(tp.mastery * 100)}
+                    )
+
         return {
             **stats,
             "streak": streak,
@@ -36,6 +49,7 @@ class ProgressService:
             "strongest": strongest,
             "weakest": weakest,
             "recommended_topic": recommended_topic,
+            "curriculum_weak": curriculum_weak,
         }
 
     async def render_dashboard(self, user_id: int) -> str:
@@ -63,6 +77,11 @@ class ProgressService:
         if d["recommended_topic"]:
             parts.append("")
             parts.append(f"🎯 <b>Recommended topic:</b> {d['recommended_topic']}")
+        if d.get("curriculum_weak"):
+            parts.append("")
+            parts.append("📚 <b>Curriculum mastery</b>")
+            for item in d["curriculum_weak"]:
+                parts.append(f"• {item['topic']} — {item['mastery']}%")
         if d["recent"]:
             parts.append("")
             parts.append("🕐 <b>Recent activity</b>")

@@ -137,6 +137,7 @@ class QuizService:
 
         await self.progress_repo.record_activity(quiz.user_id, quizzes=1)
         await self.user_repo.add_xp(await self.user_repo.get(quiz.user_id), correct * 2)
+        await self._record_topic_mastery(quiz, answers)
         await self.session.commit()
 
         questions = await self.repo.get_questions(quiz_id)
@@ -185,6 +186,30 @@ class QuizService:
             key = topic or "general"
             counts[key] = counts.get(key, 0) + 1
         return [t for t, _ in sorted(counts.items(), key=lambda kv: -kv[1])[:limit]]
+
+    async def _record_topic_mastery(self, quiz, answers) -> None:
+        """Update curriculum TopicProgress for topics matching the user's course."""
+        from app.database.repositories.curriculum_repo import CurriculumRepository
+
+        profile = await self.user_repo.get_profile(quiz.user_id)
+        if profile is None or not profile.course_id:
+            return
+        repo = CurriculumRepository(self.session)
+        course_topics = await repo.list_topics(profile.course_id)
+        if not course_topics:
+            return
+        by_name = {t.name.strip().lower(): t for t in course_topics}
+        questions = await self.repo.get_questions(quiz.id)
+        qmap = {q.id: q for q in questions}
+        for ans in answers:
+            if ans.is_correct is None:
+                continue
+            q = qmap.get(ans.question_id)
+            if q is None or not q.topic:
+                continue
+            topic = by_name.get(q.topic.strip().lower())
+            if topic is not None:
+                await repo.record_topic_result(quiz.user_id, topic.id, bool(ans.is_correct))
 
 
 def _validate_questions(raw: list, expected: int) -> list[dict]:

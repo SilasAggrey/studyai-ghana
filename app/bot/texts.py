@@ -30,9 +30,10 @@ HELP = """\
 /studyplan — Study plan (Phase 2)
 /progress — Progress dashboard
 /history — Past activity (Phase 2)
-/leaderboard — Leaderboard (Phase 3)
-/premium — Premium plans
-/settings — Settings
+ /leaderboard — Leaderboard (Phase 3)
+ /curriculum — SHS / University curriculum & topics
+ /premium — Premium plans
+ /settings — Settings
 
 <b>Tips</b>
 • Use the buttons on the main menu for most actions.

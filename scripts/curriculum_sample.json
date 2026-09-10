@@ -1,0 +1,83 @@
+{
+  "verified": false,
+  "note": "SAMPLE / UNVERIFIED demo data. Replace with verified curriculum via the same importer. Do not treat as official.",
+  "universities": [
+    {
+      "name": "Central University",
+      "country": "Ghana",
+      "departments": [
+        {
+          "name": "School of Computing (SAMPLE)",
+          "programmes": [
+            {
+              "name": "Information Technology",
+              "levels": [
+                {
+                  "name": "Level 100",
+                  "semesters": [
+                    {
+                      "name": "Semester 1",
+                      "courses": [
+                        {
+                          "name": "Computer Hardware",
+                          "topics": [
+                            {
+                              "name": "Input Devices",
+                              "subtopics": ["Keyboard", "Mouse", "Scanner", "Microphone"]
+                            },
+                            {"name": "Output Devices", "subtopics": ["Monitor", "Printer", "Speaker"]},
+                            {"name": "Storage Devices", "subtopics": ["HDD", "SSD", "Flash Drive"]},
+                            {"name": "CPU", "subtopics": ["ALU", "Control Unit", "Registers"]}
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "shs_programmes": [
+    {
+      "name": "General Science",
+      "levels": [{"name": "SHS 1"}, {"name": "SHS 2"}, {"name": "SHS 3"}],
+      "subjects": [
+        {"name": "Biology", "education_type": "shs"},
+        {"name": "Chemistry", "education_type": "shs"},
+        {"name": "Physics (SHS)", "education_type": "shs"},
+        {"name": "Elective Mathematics", "education_type": "shs"},
+        {"name": "Mathematics (Core)", "education_type": "shs"},
+        {"name": "English Language", "education_type": "shs"}
+      ]
+    },
+    {
+      "name": "General Arts",
+      "levels": [{"name": "SHS 1"}, {"name": "SHS 2"}, {"name": "SHS 3"}],
+      "subjects": [
+        {"name": "History", "education_type": "shs"},
+        {"name": "Government", "education_type": "shs"},
+        {"name": "Economics (SHS)", "education_type": "shs"},
+        {"name": "Geography", "education_type": "shs"},
+        {"name": "Literature in English", "education_type": "shs"},
+        {"name": "Mathematics (Core)", "education_type": "shs"},
+        {"name": "English Language", "education_type": "shs"}
+      ]
+    },
+    {
+      "name": "Business",
+      "levels": [{"name": "SHS 1"}, {"name": "SHS 2"}, {"name": "SHS 3"}],
+      "subjects": [
+        {"name": "Accounting (SHS)", "education_type": "shs"},
+        {"name": "Economics (SHS)", "education_type": "shs"},
+        {"name": "Business Management", "education_type": "shs"},
+        {"name": "Costing", "education_type": "shs"},
+        {"name": "Mathematics (Core)", "education_type": "shs"},
+        {"name": "English Language", "education_type": "shs"}
+      ]
+    }
+  ]
+}

@@ -27,12 +27,19 @@ class User(Base, TimestampMixin):
     premium_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    # Academic profile fields
-    student_type: Mapped[str] = mapped_column(String(20), default="SHS")  # SHS or University
+    # Gamification / leaderboard
+    xp: Mapped[int] = mapped_column(Integer, default=0)
+    level: Mapped[int] = mapped_column(Integer, default=1)
+    streak_days: Mapped[int] = mapped_column(Integer, default=0)
+    last_activity_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    referral_code: Mapped[str | None] = mapped_column(String(16), unique=True, index=True)
+    referred_by_id: Mapped[int | None] = mapped_column(BigInteger)
+
+    # Academic profile fields (gamification `level` above is separate)
+    student_type: Mapped[str | None] = mapped_column(String(20), default="SHS")
     school_university: Mapped[str | None] = mapped_column(String(100), default="", nullable=True)
     department: Mapped[str | None] = mapped_column(String(100), default="", nullable=True)
     programme: Mapped[str | None] = mapped_column(String(100), default="", nullable=True)
-    level: Mapped[str | None] = mapped_column(String(50), default="", nullable=True)
     semester: Mapped[str | None] = mapped_column(String(50), default="", nullable=True)
 
     # Leaderboard privacy: expose a display name instead of the real one.

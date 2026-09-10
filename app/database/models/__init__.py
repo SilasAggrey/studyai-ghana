@@ -1,6 +1,15 @@
 from app.database.models.user import User
 from app.database.models.profile import StudentProfile
 from app.database.models.content import University, Subject, Topic
+from app.database.models.curriculum import (
+    Course,
+    Department,
+    Programme,
+    ProgrammeLevel,
+    Semester,
+    SubjectProgramme,
+    TopicProgress,
+)
 from app.database.models.quiz import Quiz, QuizQuestion, QuizAnswer
 from app.database.models.activity import Activity
 from app.database.models.ai_usage import AiUsage
@@ -25,6 +34,13 @@ __all__ = [
     "University",
     "Subject",
     "Topic",
+    "Department",
+    "Programme",
+    "ProgrammeLevel",
+    "Semester",
+    "Course",
+    "SubjectProgramme",
+    "TopicProgress",
     "Quiz",
     "QuizQuestion",
     "QuizAnswer",
