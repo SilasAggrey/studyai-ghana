@@ -201,10 +201,22 @@ async def university_chosen(call: CallbackQuery, state: FSMContext, session):
     departments = await svc.departments(university_id)
     await state.update_data(university_id=university_id, university_name=uni.name if uni else "")
     if not departments:
+        from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="⬅️ Choose another university", callback_data="cur:type:university")],
+                [InlineKeyboardButton(text="🤖 Generate topics with AI", callback_data="cur:topics:ai")],
+                [InlineKeyboardButton(text="🏠 Main Menu", callback_data="menu:main")],
+            ]
+        )
         await _safe_edit(
             call,
-            "🏫 No departments have been added for this university yet.",
-            back_to_menu_keyboard(),
+            f"🏫 <b>{uni.name if uni else 'This university'}</b>\n\n"
+            "No verified curriculum has been imported for this school yet.\n\n"
+            "You can still study: pick another university, or generate "
+            "<b>AI-suggested topics</b> (not official curriculum).",
+            kb,
         )
         await call.answer()
         return

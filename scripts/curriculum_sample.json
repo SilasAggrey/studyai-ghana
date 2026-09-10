@@ -39,6 +39,105 @@
           ]
         }
       ]
+    },
+    {
+      "name": "University of Ghana",
+      "country": "Ghana",
+      "departments": [
+        {
+          "name": "School of Physical and Mathematical Sciences (SAMPLE)",
+          "programmes": [
+            {
+              "name": "Computer Science",
+              "levels": [
+                {
+                  "name": "Level 100",
+                  "semesters": [
+                    {
+                      "name": "Semester 1",
+                      "courses": [
+                        {
+                          "name": "Introduction to Computing",
+                          "topics": [
+                            {"name": "Computer Systems", "subtopics": ["Hardware", "Software"]},
+                            {"name": "Data Representation", "subtopics": ["Binary", "Number Systems"]}
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kwame Nkrumah University of Science and Technology",
+      "country": "Ghana",
+      "departments": [
+        {
+          "name": "College of Engineering (SAMPLE)",
+          "programmes": [
+            {
+              "name": "Computer Engineering",
+              "levels": [
+                {
+                  "name": "Level 100",
+                  "semesters": [
+                    {
+                      "name": "Semester 1",
+                      "courses": [
+                        {
+                          "name": "Engineering Fundamentals",
+                          "topics": [
+                            {"name": "Measurement", "subtopics": ["Units", "Errors"]},
+                            {"name": "Basic Circuits", "subtopics": ["Resistors", "Ohm's Law"]}
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ashesi University",
+      "country": "Ghana",
+      "departments": [
+        {
+          "name": "Computer Science and Information Systems (SAMPLE)",
+          "programmes": [
+            {
+              "name": "Computer Science",
+              "levels": [
+                {
+                  "name": "Level 100",
+                  "semesters": [
+                    {
+                      "name": "Semester 1",
+                      "courses": [
+                        {
+                          "name": "Programming Fundamentals",
+                          "topics": [
+                            {"name": "Variables and Types", "subtopics": ["Integers", "Strings", "Booleans"]},
+                            {"name": "Control Flow", "subtopics": ["Conditions", "Loops"]}
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "shs_programmes": [
