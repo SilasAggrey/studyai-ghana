@@ -1,10 +1,12 @@
 """Quiz service: generation, lifecycle, scoring, and analytics."""
 from datetime import datetime, timezone
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.base import AIProviderError
 from app.config import get_settings
+from app.database.models import Quiz, QuizAnswer, QuizQuestion
 from app.database.repositories.progress_repo import ProgressRepository
 from app.database.repositories.quiz_repo import QuizRepository
 from app.database.repositories.user_repo import UserRepository
@@ -85,10 +87,6 @@ class QuizService:
 
         Idempotent: re-answering the same question returns the stored result.
         """
-        from sqlalchemy import select
-
-        from app.database.models import QuizAnswer, QuizQuestion
-
         question = await self.session.get(QuizQuestion, question_id)
         if question is None or question.quiz_id != quiz_id:
             raise ValueError("question-not-in-quiz")
@@ -169,11 +167,6 @@ class QuizService:
         }
 
     async def weak_topics_for_user(self, user_id: int, limit: int = 3) -> list[str]:
-        """Top topics the user consistently misses (used for personalisation)."""
-        from sqlalchemy import select
-
-        from app.database.models import Quiz, QuizAnswer, QuizQuestion
-
         rows = await self.session.execute(
             select(QuizQuestion.topic, QuizAnswer.is_correct)
             .join(Quiz, Quiz.id == QuizQuestion.quiz_id)

@@ -10,6 +10,7 @@ Responsible for:
 import hashlib
 import logging
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.base import AIProviderError
@@ -26,7 +27,7 @@ from app.ai.prompts.document import (
 )
 from app.ai.prompts.quiz import QUIZ_SYSTEM, quiz_prompt
 from app.config import get_settings
-from app.database.models import AiUsage
+from app.database.models import AiUsage, StudentProfile, User
 from app.database.repositories.progress_repo import ProgressRepository
 from app.utils.errors import NotConfiguredError, UsageLimitError
 
@@ -248,9 +249,6 @@ class AIService:
             return extract_json_array(text)
 
     async def _student_context(self, user_id: int) -> str:
-        from sqlalchemy import select
-
-        from app.database.models import StudentProfile
         from app.services.curriculum_service import CurriculumService
 
         result = await self.session.execute(
@@ -259,7 +257,6 @@ class AIService:
         profile = result.scalar_one_or_none()
         if profile is None:
             return ""
-        # Prefer the structured curriculum context when available.
         if (
             profile.shs_programme_id
             or profile.university_programme_id
@@ -283,10 +280,6 @@ class AIService:
         return "\n".join(parts)
 
     async def _is_premium(self, user_id: int) -> bool:
-        from sqlalchemy import select
-
-        from app.database.models import User
-
         result = await self.session.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
         return bool(user and user.is_premium)

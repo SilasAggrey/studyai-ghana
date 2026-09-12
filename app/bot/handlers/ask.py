@@ -15,10 +15,8 @@ from app.bot.keyboards import (
     main_menu,
 )
 from app.bot.states import AskAI
-from app.bot.texts import AI_FAILED, AI_NOT_CONFIGURED, CANCEL_TEXT
+from app.bot.texts import AI_FAILED, AI_NOT_CONFIGURED
 from app.services.ai_service import AIService
-from app.services.progress_service import ProgressService
-from app.services.user_service import UserService
 from app.utils.errors import LimitExceededError, NotConfiguredError
 
 logger = logging.getLogger(__name__)
@@ -86,32 +84,11 @@ async def handle_question(message: Message, state: FSMContext, session, user):
     data = await state.get_data()
     level_hint = LEVEL_HINTS.get(data.get("level"), "")
 
-    # Build a compact personalisation context (only what is relevant).
-    service = UserService(session)
-    try:
-        profile = await service.repo.get_profile(user.id)
-        context_parts = []
-        if profile:
-            context_parts.append(
-                f"Student level: {profile.education_type} ({profile.program or '—'})"
-            )
-            if profile.subjects:
-                context_parts.append(f"Subjects: {', '.join(profile.subjects)}")
-        from app.services.quiz_service import QuizService
-
-        weak = await QuizService(session).weak_topics_for_user(user.id, 3)
-        if weak:
-            context_parts.append(f"Known weak areas: {', '.join(weak)}")
-        if level_hint:
-            context_parts.append(f"Requested depth: {level_hint}")
-        context = "\n".join(context_parts)
-    except Exception as exc:  # never let context building break the tutor
-        logger.warning("context build failed: %s", exc)
-        context = ""
-
-    await message.bot.send_chat_action(chat_id=message.chat.id, action="typing")
     try:
         ai = AIService(session)
+        context = await ai._student_context(user.id)
+        if level_hint:
+            context = f"{context}\nRequested depth: {level_hint}" if context else f"Requested depth: {level_hint}"
         answer = await ai.answer_question(user.id, question, context)
     except LimitExceededError:
         from app.bot.texts import build_daily_limit_text
